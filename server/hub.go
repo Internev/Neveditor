@@ -1,5 +1,9 @@
 package main
 
+import "fmt"
+
+var contents = make(map[string]string)
+
 type message struct {
   data []byte
   channel string
@@ -28,12 +32,15 @@ func (h *hub) run() {
   for {
     select{
     case s := <- h.register:
+      // fmt.Println("wild client has appeared in the brush!")
       clients := h.channels[s.channel]
       if clients == nil {
         clients = make(map[*client]bool)
         h.channels[s.channel] = clients
       }
-      h.channels[s.channel] = true
+      h.channels[s.channel][s.client] = true
+      s.client.send <- []byte(contents[s.channel]) //make into bytes?
+      //send the latest data for room, if needed.
     case s := <- h.unregister:
       clients := h.channels[s.channel]
       if clients != nil {
@@ -47,9 +54,11 @@ func (h *hub) run() {
       }
     case m := <- h.broadcast:
       clients := h.channels[m.channel]
+      // fmt.Println("broadcasting message to ", clients, "data is: ", m.data)
 	    for c := range clients {
         select {
         case c.send <- m.data:
+        contents[m.channel] = string(m.data)
         default:
           close(c.send)
           delete(clients, c)

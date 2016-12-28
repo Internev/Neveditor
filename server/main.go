@@ -11,6 +11,7 @@ func main() {
   fmt.Println("Go server, go! (8k)")
 
   // run the hub to start websockets
+  go h.run()
 
   r := mux.NewRouter()
 

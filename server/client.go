@@ -1,6 +1,7 @@
 package main
 
 import (
+  "fmt"
   "log"
   "net/http"
   "time"
@@ -71,6 +72,7 @@ func (s *subscription) writePump() {
 	for {
 		select {
 		case message, ok := <-c.send:
+			// fmt.Println("Writepump: client has fired message", message)
 			if !ok {
 				c.write(websocket.CloseMessage, []byte{})
 				return
