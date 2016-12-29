@@ -19,6 +19,11 @@ func main() {
   // r.HandleFunc("/db", saveDoc).Methods("POST")
   // r.HandleFunc("/db", retrieveDoc).Methods("GET")
   // r.HandleFunc("/db", updateDoc).Methods("UPDATE")
+  // This is a terrible regex, mux does not support lots of regex stuff :(
+  // Matches 5 char unique url.
+  r.HandleFunc("/{channel:[0-9A-Za-z][0-9A-Za-z][0-9A-Za-z][0-9A-Za-z][0-9A-Za-z]}", customChannelHandler)
+
+  r.HandleFunc("/getUrl", urlHandler).Methods("GET")
 
   // Serve static files
   r.PathPrefix("/").Handler(http.FileServer(http.Dir("../client")))

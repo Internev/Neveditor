@@ -3,25 +3,32 @@ $(function() {
         return;
     }
 
+    var channel, conn;
     var content = $("#content");
-    var conn = new WebSocket('ws://' + window.location.host + '/ws/new');
-    var sessionId = null;
 
-    // Textarea is editable only when socket is opened.
-    conn.onopen = function(e) {
+    $.get('/getUrl', function(data, err){
+      console.log('getUrl datas!:', data, err);
+      channel = data;
+      conn = new WebSocket('ws://' + window.location.host + '/ws/new');
+      // var sessionId = null;
+
+      // Textarea is editable only when socket is opened.
+      conn.onopen = function(e) {
         content.attr("disabled", false);
-    };
+      };
 
-    conn.onclose = function(e) {
+      conn.onclose = function(e) {
         content.attr("disabled", true);
-    };
+      };
 
-    // Whenever we receive a message, update textarea
-    conn.onmessage = function(e) {
+      // Whenever we receive a message, update textarea
+      conn.onmessage = function(e) {
         if (e.data != content.val()) {
-            content.val(e.data);
+          content.val(e.data);
         }
-    };
+      };
+    });
+
 
     var timeoutId = null;
     var typingTimeoutId = null;
