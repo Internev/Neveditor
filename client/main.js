@@ -4,7 +4,7 @@ $(function() {
     }
 
     var content = $("#content");
-    var conn = new WebSocket('ws://' + window.location.host + '/ws/itishot');
+    var conn = new WebSocket('ws://' + window.location.host + '/ws/new');
     var sessionId = null;
 
     // Textarea is editable only when socket is opened.

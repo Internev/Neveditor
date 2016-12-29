@@ -1,12 +1,13 @@
 package main
 
 import (
-  "fmt"
+  // "fmt"
   "log"
   "net/http"
   "time"
   "github.com/gorilla/websocket"
   "github.com/gorilla/mux"
+  "github.com/dchest/uniuri"
 )
 
 const (
@@ -91,7 +92,12 @@ func (s *subscription) writePump() {
 func serveWS(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgrader.Upgrade(w, r, nil)
 	vars := mux.Vars(r)
-	log.Println("this is the channel: ", vars["channel"])
+  if vars["channel"] == "new" {
+    // if user is new, give unique url, 5 char extension.
+    channelId := uniuri.NewLen(5)
+    log.Println("Fresh client, channel is: ", vars["channel"], "setting to: ", channelId)
+  }
+
 	if err != nil {
 		log.Println("you have failed in serving the WS master", err)
 		return

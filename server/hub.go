@@ -1,7 +1,8 @@
 package main
 
-import "fmt"
+// import "fmt"
 
+// save copy of each document locally (for broadcast to new clients)
 var contents = make(map[string]string)
 
 type message struct {
@@ -39,8 +40,8 @@ func (h *hub) run() {
         h.channels[s.channel] = clients
       }
       h.channels[s.channel][s.client] = true
-      s.client.send <- []byte(contents[s.channel]) //make into bytes?
-      //send the latest data for room, if needed.
+      //send the latest data for room (empty string if new room)
+      s.client.send <- []byte(contents[s.channel])
     case s := <- h.unregister:
       clients := h.channels[s.channel]
       if clients != nil {
@@ -49,6 +50,10 @@ func (h *hub) run() {
           close(s.client.send)
           if len(clients) == 0 {
             delete(h.channels, s.channel)
+            if len(contents[s.channel]) != 0 {
+              //delete contents for channel if no more clients using it.
+              delete(contents, s.channel)
+            }
           }
         }
       }
@@ -64,6 +69,10 @@ func (h *hub) run() {
           delete(clients, c)
           if len(clients) == 0 {
             delete(h.channels, m.channel)
+            if len(contents[m.channel]) != 0 {
+              //delete contents for channel if no more clients using it.
+              delete(contents, m.channel)
+            }
           }
         }
       }
