@@ -1,22 +1,22 @@
-FROM node:argon
+# Start from a Debian image with the latest version of Go installed
+# and a workspace (GOPATH) configured at /go.
+FROM golang:latest
 
-RUN npm install webpack -g
+# Copy the local package files to the container's workspace.
+ADD . $GOPATH/src/github.com/internev/tesis
 
-RUN mkdir -p /tmp
-WORKDIR /tmp
-COPY package.json /tmp/
-RUN npm config set registry http://registry.npmjs.org/ && npm install
+WORKDIR $GOPATH/src/github.com/internev/tesis/server
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-COPY . /usr/src/app/
-RUN cp -a /tmp/node_modules /usr/src/app/
+# Build the outyet command inside the container.
+# (You may fetch or manage dependencies here,
+# either manually or with a tool like "godep".)
+RUN go get github.com/dchest/uniuri
+RUN go get github.com/gorilla/mux
+RUN go get github.com/gorilla/websocket
+RUN go install github.com/internev/tesis/server
 
-#RUN webpack
+# Run the outyet command by default when the container starts.
+ENTRYPOINT /go/bin/server
 
-ENV NODE_ENV=production
-ENV PORT=4000
-
-CMD [ "npm", "start" ]
-
-EXPOSE 4000
+# Document that the service listens on port 8000.
+EXPOSE 8000

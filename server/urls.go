@@ -8,7 +8,7 @@ import (
   "encoding/json"
 )
 
-// urls.go handles unique url assignment. 
+// urls.go handles unique url assignment.
 
 var clientUrl string
 var customChannelSet bool
@@ -29,6 +29,7 @@ func urlHandler(w http.ResponseWriter, r *http.Request) {
   customChannelSet = false
   clientUrlJSON, _ := json.Marshal(clientUrl)
 
+  fmt.Println("Sending custom URL:", clientUrl)
   w.Header().Set("Content-Type", "application/json")
   w.WriteHeader(200)
   fmt.Fprintf(w, "%s", clientUrlJSON)

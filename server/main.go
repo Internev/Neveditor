@@ -2,14 +2,24 @@ package main
 
 import (
   "fmt"
+  "flag"
   "net/http"
   "log"
+  "os"
   "github.com/gorilla/mux"
 )
+
+var httpAddr   = flag.String("http", ":8000", "Listen address")
 
 // handles routing
 func main() {
   fmt.Println("Go server, go! (8k)")
+  pwd, err := os.Getwd()
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+    fmt.Println("Current directory:", pwd)
 
   // run the hub to start websockets
   go h.run()
@@ -30,8 +40,8 @@ func main() {
   // special route for new connection, must ask /getUrl for unique url identifier for channel.
   r.HandleFunc("/getUrl", urlHandler).Methods("GET")
 
-  // Serve static files - nb: this is dependent on run location (ie: it's set up to be run from root)
-  r.PathPrefix("/").Handler(http.FileServer(http.Dir("client")))
+  // Serve static files - nb: this is dependent on run location (ie: it's set up to be run from server)
+  r.PathPrefix("/").Handler(http.FileServer(http.Dir("../client")))
 
-  log.Fatal(http.ListenAndServe(":8000", r))
+  log.Fatal(http.ListenAndServe(*httpAddr, r))
 }
