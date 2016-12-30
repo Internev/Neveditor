@@ -7,9 +7,10 @@ $(function() {
     var content = $("#content");
 
     $.get('/getUrl', function(data, err){
+      // this is to get the unique url for the websocket. Need to assign connection inside of this call because async.
       console.log('getUrl datas!:', data, err);
       channel = data;
-      conn = new WebSocket('ws://' + window.location.host + '/ws/new');
+      conn = new WebSocket('ws://' + window.location.host + '/ws/' + channel);
       // var sessionId = null;
 
       // Textarea is editable only when socket is opened.
@@ -51,23 +52,23 @@ $(function() {
         }, 1100);
     });
 
-    $('#submit').on('click', function(){
-      if (sessionId === null){
-        $.post('/db', JSON.stringify({Content: content.val()}), function(data, err){;
-          sessionId = data;
-          console.log("Saved document, created id:", sessionId);
-        });
-      } else {
-        $.post('/db', JSON.stringify({Id: sessionId, Content: content.val()}), function(data, err){
-          console.log('saved document with session id:', data, err);
-        });
-      }
-    });
-
-    $('#dataz').on('click', function(){
-      console.log('dataz clicked');
-      $.get('/db', function(data, err){
-        console.log('dataz!', data, err);
-      });
-    });
+    // $('#submit').on('click', function(){
+    //   if (sessionId === null){
+    //     $.post('/db', JSON.stringify({Content: content.val()}), function(data, err){;
+    //       sessionId = data;
+    //       console.log("Saved document, created id:", sessionId);
+    //     });
+    //   } else {
+    //     $.post('/db', JSON.stringify({Id: sessionId, Content: content.val()}), function(data, err){
+    //       console.log('saved document with session id:', data, err);
+    //     });
+    //   }
+    // });
+    //
+    // $('#dataz').on('click', function(){
+    //   console.log('dataz clicked');
+    //   $.get('/db', function(data, err){
+    //     console.log('dataz!', data, err);
+    //   });
+    // });
 });

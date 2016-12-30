@@ -2,6 +2,9 @@ package main
 
 // import "fmt"
 
+// hub handles registering/unregistering of clients to channels
+// and broadcast of messages to all clients in each channel.
+
 // save copy of each document locally (for broadcast to new clients)
 var contents = make(map[string]string)
 
@@ -29,6 +32,7 @@ var h = hub{
   channels:   make(map[string]map[*client]bool),
 }
 
+// handles register/unregister/broadcast on channel by channel basis.
 func (h *hub) run() {
   for {
     select{

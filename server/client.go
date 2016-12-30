@@ -7,8 +7,13 @@ import (
   "time"
   "github.com/gorilla/websocket"
   "github.com/gorilla/mux"
-  "github.com/dchest/uniuri"
+  // "github.com/dchest/uniuri"
 )
+
+// client.go handles read/write of messages to the websocket channel.
+// readPump: sends messages to channel.
+// writePump: receives messages from channel.
+// serveWS: upgrades http connection to websocket, starts read/write pumps.
 
 const (
   writeWait = 10 * time.Second
@@ -33,7 +38,7 @@ type client struct {
 	send chan []byte
 }
 
-// sends message struct (msg, room) to the hub for broadcast
+// sends message struct (msg, room) from socket to the hub for broadcast.
 func (s subscription) readPump() {
     c := s.client
     defer func() {
@@ -62,6 +67,7 @@ func (c *client) write(mt int, payload []byte) error {
   return c.ws.WriteMessage(mt, payload)
 }
 
+// receives messages from hub, writes to websocket.
 func (s *subscription) writePump() {
 	c := s.client
 	ticker := time.NewTicker(pingPeriod)
@@ -89,10 +95,11 @@ func (s *subscription) writePump() {
 	}
 }
 
+// upgrades http connection, starts read/write pumps.
 func serveWS(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgrader.Upgrade(w, r, nil)
 	vars := mux.Vars(r)
-  
+
 	if err != nil {
 		log.Println("you have failed in serving the WS master", err)
 		return
