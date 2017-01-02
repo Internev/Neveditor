@@ -13,6 +13,6 @@ If that doesn't work, run 'go get' on:
 
 To start server run:
 ```
-go run server/*.go
+go run *.go
 ```
-from root.
+from server folder.

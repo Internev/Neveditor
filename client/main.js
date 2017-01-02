@@ -1,74 +1,51 @@
-$(function() {
-    if (!window["WebSocket"]) {
-        return;
-    }
+import Vue from 'vue'
+import Resource from 'vue-resource'
 
-    var channel, conn;
-    var content = $("#content");
+var channel, conn;
 
-    $.get('/getUrl', function(data, err){
+Vue.use(Resource)
+
+new Vue({
+  el: '#container',
+
+  data: {
+    ws: null,
+    tesisdoc: 'doccotexteorooni',
+    channel: '',
+  },
+
+  created: function() {
+    var self = this;
+    this.$http.get('/getUrl').then((res) => {
       // this is to get the unique url for the websocket. Need to assign connection inside of this call because async.
-      console.log('getUrl datas!:', data, err);
-      channel = data;
-      conn = new WebSocket('ws://' + window.location.host + '/ws/' + channel);
+      console.log('getUrl datas!:', res);
+      this.channel = res.body;
+      this.ws = new WebSocket('ws://' + window.location.host + '/ws/' + this.channel);
       // var sessionId = null;
 
+      console.log('websocket address is:',this.ws);
       // Textarea is editable only when socket is opened.
-      conn.onopen = function(e) {
-        content.attr("disabled", false);
-      };
-
-      conn.onclose = function(e) {
-        content.attr("disabled", true);
-      };
-
+      // this.ws.onopen = function(e) {
+      //   content.attr("disabled", false);
+      // };
+      //
+      // this.ws.onclose = function(e) {
+      //   content.attr("disabled", true);
+      // };
+      console.log('document contents:', this.tesisdoc);
       // Whenever we receive a message, update textarea
-      conn.onmessage = function(e) {
-        if (e.data != content.val()) {
-          content.val(e.data);
+      this.ws.onmessage = (e) => {
+        if (e.data != this.tesisdoc) {
+          this.tesisdoc = e.data;
         }
       };
     });
+  },
 
-
-    var timeoutId = null;
-    var typingTimeoutId = null;
-    var isTyping = false;
-
-    content.on("keydown", function() {
-        isTyping = true;
-        window.clearTimeout(typingTimeoutId);
-    });
-
-    content.on("keyup", function() {
-        typingTimeoutId = window.setTimeout(function() {
-            isTyping = false;
-        }, 1000);
-
-        window.clearTimeout(timeoutId);
-        timeoutId = window.setTimeout(function() {
-            if (isTyping) return;
-            conn.send(content.val());
-        }, 1100);
-    });
-
-    // $('#submit').on('click', function(){
-    //   if (sessionId === null){
-    //     $.post('/db', JSON.stringify({Content: content.val()}), function(data, err){;
-    //       sessionId = data;
-    //       console.log("Saved document, created id:", sessionId);
-    //     });
-    //   } else {
-    //     $.post('/db', JSON.stringify({Id: sessionId, Content: content.val()}), function(data, err){
-    //       console.log('saved document with session id:', data, err);
-    //     });
-    //   }
-    // });
-    //
-    // $('#dataz').on('click', function(){
-    //   console.log('dataz clicked');
-    //   $.get('/db', function(data, err){
-    //     console.log('dataz!', data, err);
-    //   });
-    // });
-});
+  methods: {
+    send: function() {
+      console.log('sending:', this.tesisdoc);
+      this.ws.send(this.tesisdoc)
+    }
+  }
+})

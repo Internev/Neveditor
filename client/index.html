@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <title>Tesis Editor</title>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-    <link rel="stylesheet" href="main.css" type="text/css" />
+<head>
+  <meta charset="utf-8">
+  <title>Vue Example</title>
 </head>
+
 <body>
-    <textarea spellcheck="false" class="doc" id="content" disabled="disabled">Tesis</textarea>
-    <div id="submit">Save Document to db</div>
-    <div id="dataz">get dem dataz</div>
-    <script src="main.js"></script>
+  <div id="container">
+    <textarea v-model="tesisdoc" @keyup="send"></textarea>
+    <div>Current Channel: {{ channel }}</div>
+  </div>
+  <script src="dist/bundle.js"></script>
 </body>
+
 </html>
